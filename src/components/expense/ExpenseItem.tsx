@@ -1,8 +1,8 @@
-import { Expense } from '@/services/expenseService';
+import { Expense } from '@/services/expense.service';
 import { Button } from '@/components/ui/button';
-import { CATEGORIES } from '@/components/ExpenseForm';
+import { CATEGORIES } from '@/components/expense/ExpenseForm';
+import { formatDate, formatCurrency } from '@/utils/formatDate';
 import { Pencil, Trash2, Calendar, FileText } from 'lucide-react';
-import { format } from 'date-fns';
 
 interface ExpenseItemProps {
   expense: Expense;
@@ -33,11 +33,8 @@ const getCategoryStyles = (category: string): string => {
 
 const ExpenseItem = ({ expense, onEdit, onDelete, isDeleting }: ExpenseItemProps) => {
   const categoryInfo = getCategoryInfo(expense.category);
-  const formattedDate = format(new Date(expense.date), 'MMM dd, yyyy');
-  const formattedAmount = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(expense.amount);
+  const formattedDate = formatDate(expense.date);
+  const formattedAmount = formatCurrency(expense.amount);
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete "${expense.title}"?`)) {
@@ -52,16 +49,12 @@ const ExpenseItem = ({ expense, onEdit, onDelete, isDeleting }: ExpenseItemProps
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="font-semibold text-foreground truncate">{expense.title}</h3>
-            <span className="text-lg font-bold text-accent shrink-0">
-              {formattedAmount}
-            </span>
+            <span className="text-lg font-bold text-accent shrink-0">{formattedAmount}</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-sm">
             {/* Category Badge */}
-            <span
-              className={`category-badge border ${getCategoryStyles(expense.category)}`}
-            >
+            <span className={`category-badge border ${getCategoryStyles(expense.category)}`}>
               {categoryInfo.label}
             </span>
 
@@ -75,9 +68,7 @@ const ExpenseItem = ({ expense, onEdit, onDelete, isDeleting }: ExpenseItemProps
             {expense.notes && (
               <span className="flex items-center gap-1 text-muted-foreground" title={expense.notes}>
                 <FileText className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline truncate max-w-[150px]">
-                  {expense.notes}
-                </span>
+                <span className="hidden sm:inline truncate max-w-[150px]">{expense.notes}</span>
               </span>
             )}
           </div>

@@ -1,8 +1,7 @@
-import Home from './Home';
+import Dashboard from './Dashboard';
 
-// Index page renders the Home component
 const Index = () => {
-  return <Home />;
+  return <Dashboard />;
 };
 
 export default Index;
