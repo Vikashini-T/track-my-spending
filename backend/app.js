@@ -3,7 +3,17 @@ const cors = require("cors");
 const expenseRoutes = require("./routes/expense.routes");
 
 const app = express();
-app.use(cors());
+//app.use(cors());
+//const cors = require("cors");
+
+app.use(
+  cors({
+    origin: "*",          // allow all origins (safe for college project)
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 
 
 app.use(express.json());
