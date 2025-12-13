@@ -1,15 +1,17 @@
 const express = require("express");
+const cors = require("cors");
 const expenseRoutes = require("./routes/expense.routes");
 
 const app = express();
+app.use(cors());
 
-// Middleware
+
 app.use(express.json());
 
-// Routes
+
 app.use("/api/expenses", expenseRoutes);
 
-// Centralized error handler
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
@@ -19,3 +21,4 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
+
