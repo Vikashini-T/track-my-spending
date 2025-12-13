@@ -11,7 +11,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Expense, ExpenseInput } from '@/services/expenseService';
+import { Expense, ExpenseInput } from '@/services/expense.service';
+import { getTodayForInput, formatDateForInput } from '@/utils/formatDate';
 import { Plus, Save, X } from 'lucide-react';
 
 // Available expense categories
@@ -26,7 +27,7 @@ export const CATEGORIES = [
 ];
 
 interface ExpenseFormProps {
-  onSubmit: (expense: ExpenseInput) => Promise<void>;
+  onSubmit: (expense: ExpenseInput) => Promise<boolean>;
   editingExpense: Expense | null;
   onCancelEdit: () => void;
   isSubmitting: boolean;
@@ -42,10 +43,8 @@ const ExpenseForm = ({
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(getTodayForInput());
   const [notes, setNotes] = useState('');
-
-  // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Pre-fill form when editing
@@ -54,8 +53,7 @@ const ExpenseForm = ({
       setTitle(editingExpense.title);
       setAmount(editingExpense.amount.toString());
       setCategory(editingExpense.category);
-      // Format date for input (YYYY-MM-DD)
-      setDate(editingExpense.date.split('T')[0]);
+      setDate(formatDateForInput(editingExpense.date));
       setNotes(editingExpense.notes || '');
     } else {
       resetForm();
@@ -67,7 +65,7 @@ const ExpenseForm = ({
     setTitle('');
     setAmount('');
     setCategory('');
-    setDate(new Date().toISOString().split('T')[0]);
+    setDate(getTodayForInput());
     setNotes('');
     setErrors({});
   };
@@ -103,7 +101,6 @@ const ExpenseForm = ({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     const expenseData: ExpenseInput = {
@@ -114,9 +111,8 @@ const ExpenseForm = ({
       notes: notes.trim(),
     };
 
-    await onSubmit(expenseData);
-
-    if (!editingExpense) {
+    const success = await onSubmit(expenseData);
+    if (success && !editingExpense) {
       resetForm();
     }
   };
@@ -164,7 +160,6 @@ const ExpenseForm = ({
 
           {/* Amount & Category Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Amount Input */}
             <div className="space-y-2">
               <Label htmlFor="amount">Amount ($)</Label>
               <Input
@@ -182,13 +177,10 @@ const ExpenseForm = ({
               )}
             </div>
 
-            {/* Category Select */}
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger
-                  className={errors.category ? 'border-destructive' : ''}
-                >
+                <SelectTrigger className={errors.category ? 'border-destructive' : ''}>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>

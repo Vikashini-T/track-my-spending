@@ -1,5 +1,5 @@
-import { Expense } from '@/services/expenseService';
-import ExpenseItem from '@/components/ExpenseItem';
+import { Expense } from '@/services/expense.service';
+import ExpenseItem from '@/components/expense/ExpenseItem';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
@@ -8,7 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CATEGORIES } from '@/components/ExpenseForm';
+import { CATEGORIES } from '@/components/expense/ExpenseForm';
+import { formatCurrency } from '@/utils/formatDate';
 import { List, Filter, TrendingUp, Receipt } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -63,11 +64,6 @@ const ExpenseList = ({
     return filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
   }, [filteredExpenses]);
 
-  const formattedTotal = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(totalAmount);
-
   // Loading skeleton
   if (isLoading) {
     return (
@@ -81,10 +77,7 @@ const ExpenseList = ({
         <CardContent>
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-20 bg-muted animate-pulse rounded-lg"
-              />
+              <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
             ))}
           </div>
         </CardContent>
@@ -108,7 +101,7 @@ const ExpenseList = ({
           <div className="flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-lg">
             <TrendingUp className="h-4 w-4 text-accent" />
             <span className="text-sm text-muted-foreground">Total:</span>
-            <span className="font-bold text-accent">{formattedTotal}</span>
+            <span className="font-bold text-accent">{formatCurrency(totalAmount)}</span>
           </div>
         </div>
 
@@ -149,26 +142,19 @@ const ExpenseList = ({
 
       <CardContent>
         {expenses.length === 0 ? (
-          // Empty state
           <div className="text-center py-12">
             <Receipt className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-            <h3 className="text-lg font-medium text-foreground mb-2">
-              No expenses yet
-            </h3>
+            <h3 className="text-lg font-medium text-foreground mb-2">No expenses yet</h3>
             <p className="text-muted-foreground">
               Start tracking your spending by adding your first expense!
             </p>
           </div>
         ) : filteredExpenses.length === 0 ? (
-          // No results for filter
           <div className="text-center py-8">
             <Filter className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
-            <p className="text-muted-foreground">
-              No expenses found for this category.
-            </p>
+            <p className="text-muted-foreground">No expenses found for this category.</p>
           </div>
         ) : (
-          // Expense list
           <div className="space-y-3">
             {filteredExpenses.map((expense) => (
               <ExpenseItem
