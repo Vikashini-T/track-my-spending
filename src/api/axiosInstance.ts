@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base URL from environment variable
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://track-my-spending-1.onrender.com/api/expenses';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:5000'
 
 // Centralized Axios instance with default configuration
 const axiosInstance = axios.create({
